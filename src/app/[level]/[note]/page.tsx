@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 
 import { NotePage } from "@/components/NotePage";
-import { findLevel, findNote, library } from "@/lib/library";
+import { bandOf, findLevel, findNote, library } from "@/lib/library";
 
 export const dynamicParams = false;
 
@@ -18,7 +18,9 @@ export async function generateMetadata({
 }) {
   const { level, note } = await params;
   const found = findNote(level, note);
-  return { title: found ? `${found.title} · ${found.level}` : "Deutsch Notizen" };
+  return {
+    title: found ? `${found.title} — ${found.level} — Deutsch Notizen` : "Deutsch Notizen",
+  };
 }
 
 export default async function Page({
@@ -31,5 +33,5 @@ export default async function Page({
   const note = findNote(levelSlug, noteSlug);
   if (!level || !note) notFound();
 
-  return <NotePage level={level} note={note} />;
+  return <NotePage level={level} note={note} band={bandOf(level.level)} />;
 }

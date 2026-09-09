@@ -189,28 +189,39 @@ so there's no white flash on load.
 
 ---
 
-## Colour
+## Design
 
-Four colours, each with exactly one job. That's what keeps a four-colour palette
-from turning into confetti: when you see teal you're looking at structure, when
-you see yellow you're looking at your own search term.
+The Streamlit version of these notes is a reading tool: sidebar, tabs, dense
+type. This one is a website — sticky header with the level switcher, a hero, a
+footer — and it deliberately looks nothing like it.
+
+**Hue carries information.** Rather than one accent used everywhere, colour is
+tied to the CEFR band: every A-level page is coral, every B-level page teal.
+The band colour is a single CSS variable set on the page wrapper, so table
+headers, chips, list markers and the level badge all follow from it. You can
+tell which half of the course you are in before reading a word.
 
 | | Hex | Job |
 | --- | --- | --- |
 | Cream | `#FFF6DE` | the page in light mode, the text in dark mode |
-| Teal | `#8BDFDD` | structure — table headers, block labels, list markers |
-| Coral | `#F48F68` | the accent — active tab, current note, the article tint |
-| Yellow | `#FFE394` | search highlight, and nothing else |
+| Coral | `#F48F68` | A-levels — A1, A2 |
+| Teal | `#8BDFDD` | B-levels — B1, B2 |
+| Yellow | `#FFE394` | search highlights, and nothing else |
 
-Dark mode reuses the same four rather than inventing a second set: cream becomes
-the ink, the ground is a deepened teal so the hue family holds, and coral is
-lifted slightly because the light-mode value goes muddy on a dark ground. Both
-palettes are CSS custom properties at the top of `src/app/globals.css`; nothing
-else in the stylesheet names a colour directly.
+Reserving yellow for highlights means a match is never confusable with the
+interface around it.
 
-Type: Newsreader for headings, IBM Plex Sans for text, IBM Plex Mono for labels.
+**Type.** Bricolage Grotesque for display — level codes, the hero, note titles
+— and Instrument Sans for everything else including the tables. Two families,
+clearly distinct, no monospace.
 
----
+**The hero is `der die das`.** The three articles are the most characteristic
+thing in German, the thing this site exists to help me get right, and the thing
+the vocabulary tables already tint. It is the content, not an illustration of
+it.
+
+Both palettes live as CSS custom properties at the top of
+`src/app/globals.css`; nothing else in the stylesheet names a colour directly.
 
 ## Deploying to Vercel
 

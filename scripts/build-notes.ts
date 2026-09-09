@@ -61,6 +61,23 @@ function resolveBlocks(raw: RawBlock[]): Block[] {
   );
 }
 
+const looseKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "");
+
+/**
+ * Drop a leading heading that just repeats the file's own name.
+ *
+ * Every Grammatik document opens with "B1 Grammatik", which is exactly what
+ * the page already puts in its title — printing it twice reads like a mistake.
+ */
+function dropRepeatedTitle(blocks: Block[], level: Level, title: string): Block[] {
+  const first = blocks[0];
+  if (!first || first.kind !== "heading") return blocks;
+
+  const heading = looseKey(first.spans.map((span) => span.text).join(""));
+  const candidates = [looseKey(`${level} ${title}`), looseKey(title)];
+  return candidates.includes(heading) ? blocks.slice(1) : blocks;
+}
+
 function build(): Library {
   let entries: string[] = [];
   try {
@@ -93,7 +110,7 @@ function build(): Library {
       notes.push({ ...base, kind, sheets, sortKey: `0${title.toLowerCase()}` });
       report(name, `${sheets.length} sheets`);
     } else if (kind === "document") {
-      const blocks = resolveBlocks(readDocument(file));
+      const blocks = dropRepeatedTitle(resolveBlocks(readDocument(file)), level, title);
       notes.push({ ...base, kind, blocks, sortKey: `0${title.toLowerCase()}` });
       report(name, `${blocks.length} blocks`);
     } else {

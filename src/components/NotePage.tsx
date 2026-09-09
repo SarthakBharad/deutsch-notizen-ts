@@ -1,80 +1,74 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 
 import { NoteView } from "@/components/NoteView";
-import { ThemeToggle } from "@/components/ThemeToggle";
+import { SiteFooter } from "@/components/SiteFooter";
+import { SiteHeader } from "@/components/SiteHeader";
+import { Search } from "@/lib/search";
+import type { Band } from "@/lib/library";
 import type { LevelGroup, Note } from "@/lib/types";
 
-const KICKER: Record<Note["kind"], string> = {
-  sheet: "Cheatsheet",
-  document: "Dokument",
-  book: "Buch · PDF",
-};
-
-export function NotePage({ level, note }: { level: LevelGroup; note: Note }) {
+export function NotePage({
+  level,
+  note,
+  band,
+}: {
+  level: LevelGroup;
+  note: Note;
+  band: Band;
+}) {
   const [query, setQuery] = useState("");
+  const search = useMemo(() => new Search(query), [query]);
 
   return (
-    <div className="shell">
-      <aside className="sidebar">
-        <Link className="btn" href="/">
-          ← All levels
-        </Link>
+    <div className="page" data-band={band}>
+      <SiteHeader current={level.slug} />
 
-        <div>
-          <Link className="brand" href="/">
-            Deutsch Notizen
-          </Link>
-          <div className="brand-level">{level.level}</div>
-        </div>
+      <main>
+        <div className="note-head">
+          <div className="wrap">
+            <span className="note-band">{level.level}</span>
+            <h1 className="note-title">{note.title}</h1>
 
-        <ul className="note-list">
-          {level.notes.map((entry) => (
-            <li key={entry.slug}>
-              <Link
-                href={`/${level.slug}/${entry.slug}`}
-                aria-current={entry.slug === note.slug ? "page" : undefined}
-              >
-                <span>{entry.title}</span>
-                {entry.kind === "book" && <span className="tag">PDF</span>}
-              </Link>
-            </li>
-          ))}
-        </ul>
+            <div className="note-controls">
+              {/* Two or three notes per level, so a switcher beats a menu. */}
+              {level.notes.length > 1 && (
+                <div className="switch">
+                  {level.notes.map((entry) => (
+                    <Link
+                      key={entry.slug}
+                      href={`/${level.slug}/${entry.slug}`}
+                      aria-current={entry.slug === note.slug ? "page" : undefined}
+                    >
+                      {entry.title}
+                    </Link>
+                  ))}
+                </div>
+              )}
 
-        {/* Search doesn't apply to a PDF, so the box isn't offered for one. */}
-        {note.kind !== "book" && (
-          <>
-            <hr className="rule" />
-            <div>
-              <input
-                className="field"
-                type="search"
-                value={query}
-                placeholder="Search this note…"
-                aria-label="Search this note"
-                onChange={(event) => setQuery(event.target.value)}
-              />
-              <p className="hint">
-                Umlauts optional — <em>uber</em> finds <em>über</em>.
-              </p>
+              {note.kind !== "book" && (
+                <div className="search">
+                  <input
+                    type="search"
+                    value={query}
+                    placeholder="Search this note — umlauts optional"
+                    aria-label={`Search ${note.title}`}
+                    onChange={(event) => setQuery(event.target.value)}
+                  />
+                </div>
+              )}
             </div>
-          </>
-        )}
-
-        <div className="spacer-grow" />
-        <ThemeToggle />
-      </aside>
-
-      <main className="main">
-        <div className="kicker">
-          {level.level} · {KICKER[note.kind]}
+          </div>
         </div>
-        <h1 className="note-title">{note.title}</h1>
-        <NoteView note={note} query={query} />
+
+        <div className="note-body wrap">
+          <NoteView note={note} search={search} />
+        </div>
       </main>
+
+      <SiteFooter />
     </div>
   );
 }
