@@ -1,0 +1,611 @@
+/*
+ * Four colours, each with a job.
+ *
+ *   #FFF6DE cream  — the page in light mode, the text in dark mode
+ *   #8BDFDD teal   — structure: headers, bands, block labels
+ *   #F48F68 coral  — the accent: active state, the article tint
+ *   #FFE394 yellow — search highlight, and nothing else
+ *
+ * Giving each one a single job is what keeps a four-colour palette from
+ * turning into confetti: when you see teal you are looking at structure, when
+ * you see yellow you are looking at your own search term.
+ *
+ * Dark mode reuses the same four rather than inventing a second set. Cream
+ * becomes the ink, the ground is a deepened teal so the hue family holds, and
+ * coral is lifted a little because the light-mode value goes muddy on a dark
+ * ground.
+ */
+
+@import url("https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,600;1,6..72,400&family=IBM+Plex+Sans:ital,wght@0,400;0,500;0,600;1,400&family=IBM+Plex+Mono:wght@400;500&display=swap");
+
+:root,
+[data-theme="light"] {
+  --bg: #fff6de;
+  --paper: #fffcf1;
+  --ink: #22302e;
+  --muted: #6a7a76;
+  --line: #e2d9bf;
+  --line-soft: #ede5d0;
+
+  --teal: #8bdfdd;
+  --teal-deep: #2f7c79;
+  --teal-wash: #e4f6f5;
+
+  --coral: #f48f68;
+  --coral-deep: #c25f38;
+  --coral-wash: #fdeee7;
+
+  --yellow: #ffe394;
+
+  --shade: rgba(34, 48, 46, 0.04);
+  --shade-hover: rgba(34, 48, 46, 0.03);
+  --highlight-ink: #22302e;
+}
+
+[data-theme="dark"] {
+  --bg: #16201f;
+  --paper: #1e2b2a;
+  --ink: #fff6de;
+  --muted: #94a5a2;
+  --line: #334745;
+  --line-soft: #263534;
+
+  --teal: #8bdfdd;
+  --teal-deep: #8bdfdd;
+  --teal-wash: rgba(139, 223, 221, 0.12);
+
+  --coral: #f9a284;
+  --coral-deep: #f9a284;
+  --coral-wash: rgba(244, 143, 104, 0.14);
+
+  --yellow: #ffe394;
+
+  --shade: rgba(255, 246, 222, 0.05);
+  --shade-hover: rgba(255, 246, 222, 0.04);
+  --highlight-ink: #22302e;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  font-size: 16px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* The whole page changes colour at once when the theme flips, but only for a
+   deliberate toggle — the class is removed as soon as the switch is done, so
+   nothing else on the page inherits a transition it didn't ask for. */
+body.theming,
+body.theming * {
+  transition: background-color 0.18s ease, color 0.18s ease, border-color 0.18s ease;
+}
+
+a {
+  color: var(--coral-deep);
+}
+
+code {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.85em;
+  background: var(--coral-wash);
+  color: var(--coral-deep);
+  padding: 0.12em 0.38em;
+  border-radius: 3px;
+}
+
+/* --------------------------------------------------------------- shell */
+
+.shell {
+  display: grid;
+  grid-template-columns: 264px minmax(0, 1fr);
+  min-height: 100vh;
+}
+
+.sidebar {
+  background: var(--paper);
+  border-right: 1px solid var(--line);
+  padding: 1.6rem 1.15rem 3rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.1rem;
+}
+
+.main {
+  padding: 2.4rem 2.4rem 5rem;
+  max-width: 1180px;
+  min-width: 0;
+}
+
+.eyebrow,
+.kicker,
+.count,
+.meta,
+th,
+.band td,
+.rowlabel {
+  font-family: "IBM Plex Mono", ui-monospace, Consolas, monospace;
+  font-size: 0.7rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* ------------------------------------------------------------ masthead */
+
+.masthead {
+  margin-bottom: 1.9rem;
+}
+
+.masthead .eyebrow {
+  color: var(--coral-deep);
+  margin-bottom: 0.5rem;
+}
+
+.masthead h1 {
+  font-family: "Newsreader", Georgia, serif;
+  font-weight: 600;
+  font-size: 2.9rem;
+  line-height: 1.06;
+  letter-spacing: -0.01em;
+  margin: 0 0 0.5rem;
+}
+
+.masthead p {
+  color: var(--muted);
+  max-width: 52ch;
+  margin: 0;
+}
+
+/* --------------------------------------------------------- level cards */
+
+.levels {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(232px, 1fr));
+  gap: 0.9rem;
+  margin-top: 1.6rem;
+}
+
+.level-card {
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--coral);
+  border-radius: 4px;
+  padding: 1.15rem 1.2rem 1.1rem;
+  transition: border-color 0.14s ease, transform 0.14s ease;
+}
+
+.level-card:hover {
+  border-color: var(--coral);
+  transform: translateY(-1px);
+}
+
+.level-card .code {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 2.4rem;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+}
+
+.level-card .meta {
+  color: var(--teal-deep);
+  margin-top: 0.45rem;
+}
+
+.level-card .files {
+  color: var(--muted);
+  font-size: 0.88rem;
+  margin-top: 0.6rem;
+}
+
+/* -------------------------------------------------------------- notes */
+
+.brand {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.35rem;
+  font-weight: 600;
+  text-decoration: none;
+  color: inherit;
+  display: block;
+}
+
+.brand-level {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.7rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--coral-deep);
+  margin-top: 0.15rem;
+}
+
+.note-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 0.1rem;
+}
+
+.note-list a {
+  display: flex;
+  justify-content: space-between;
+  gap: 0.5rem;
+  align-items: baseline;
+  padding: 0.4rem 0.6rem;
+  border-radius: 3px;
+  text-decoration: none;
+  color: var(--ink);
+  font-size: 0.93rem;
+  border-left: 2px solid transparent;
+}
+
+.note-list a:hover {
+  background: var(--shade-hover);
+}
+
+.note-list a[aria-current="page"] {
+  background: var(--coral-wash);
+  border-left-color: var(--coral);
+  color: var(--coral-deep);
+  font-weight: 500;
+}
+
+.note-list .tag {
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.62rem;
+  letter-spacing: 0.1em;
+  color: var(--muted);
+}
+
+.kicker {
+  color: var(--coral-deep);
+  margin-bottom: 0.45rem;
+}
+
+.note-title {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 2.1rem;
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.14;
+  margin: 0 0 1.4rem;
+}
+
+.count {
+  color: var(--muted);
+  margin: 0 0 0.7rem;
+}
+
+/* --------------------------------------------------------------- tabs */
+
+.tabs {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.15rem;
+  border-bottom: 1px solid var(--line);
+  margin-bottom: 1.2rem;
+}
+
+.tabs button {
+  font: inherit;
+  font-size: 0.89rem;
+  background: none;
+  border: none;
+  border-bottom: 2px solid transparent;
+  color: var(--muted);
+  padding: 0.45rem 0.7rem;
+  margin-bottom: -1px;
+  cursor: pointer;
+  border-radius: 3px 3px 0 0;
+}
+
+.tabs button:hover {
+  color: var(--ink);
+  background: var(--shade-hover);
+}
+
+.tabs button[aria-selected="true"] {
+  color: var(--coral-deep);
+  border-bottom-color: var(--coral);
+}
+
+/* ------------------------------------------------------------- tables */
+
+.sheet-group {
+  margin-bottom: 2rem;
+}
+
+.tbl-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--line);
+  border-radius: 4px;
+  background: var(--paper);
+  margin-bottom: 1rem;
+}
+
+table.grid {
+  border-collapse: collapse;
+  width: 100%;
+  font-size: 0.92rem;
+}
+
+table.grid th {
+  text-align: left;
+  color: var(--teal-deep);
+  background: var(--teal-wash);
+  padding: 0.6rem 0.8rem;
+  border-bottom: 1px solid var(--line);
+  white-space: nowrap;
+}
+
+table.grid td {
+  padding: 0.48rem 0.8rem;
+  border-bottom: 1px solid var(--line-soft);
+  vertical-align: top;
+  line-height: 1.45;
+}
+
+table.grid tbody tr:last-child td {
+  border-bottom: none;
+}
+
+table.grid tbody tr:hover td {
+  background: var(--shade-hover);
+}
+
+table.grid td.lead {
+  font-weight: 500;
+}
+
+table.grid tr.spacer td,
+table.grid tr.spacer:hover td {
+  padding: 0.25rem;
+  background: none;
+  border-bottom: none;
+}
+
+tr.band td,
+tr.band:hover td {
+  background: var(--coral-wash);
+  color: var(--coral-deep);
+  border-top: 1px solid var(--coral);
+  border-bottom: 1px solid var(--coral);
+  padding: 0.45rem 0.8rem;
+}
+
+/* a vertically merged label down the side of a block (Akkusativ / Dativ):
+   it names the whole block, so it reads like a header turned on its side */
+table.grid td.rowlabel,
+table.grid tbody tr:hover td.rowlabel {
+  background: var(--teal-wash);
+  border-right: 1px solid var(--line);
+  color: var(--teal-deep);
+  text-align: center;
+  vertical-align: middle;
+  white-space: nowrap;
+  width: 1%;
+}
+
+.art {
+  color: var(--coral-deep);
+  font-weight: 500;
+}
+
+.aux {
+  color: var(--muted);
+}
+
+mark {
+  background: var(--yellow);
+  color: var(--highlight-ink);
+  padding: 0 0.12em;
+  border-radius: 2px;
+}
+
+/* ---------------------------------------------------------- documents */
+
+.doc h2 {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.55rem;
+  font-weight: 600;
+  margin: 2rem 0 0.7rem;
+  padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line);
+}
+
+.doc h2:first-child {
+  margin-top: 0.2rem;
+}
+
+.doc h3 {
+  font-family: "Newsreader", Georgia, serif;
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin: 1.5rem 0 0.5rem;
+}
+
+.doc h4 {
+  font-size: 1rem;
+  font-weight: 600;
+  margin: 1.2rem 0 0.4rem;
+}
+
+.doc p {
+  margin: 0.45rem 0;
+  line-height: 1.65;
+}
+
+.doc strong {
+  font-weight: 600;
+  color: var(--coral-deep);
+}
+
+.doc ul,
+.doc ol {
+  margin: 0.5rem 0 0.8rem;
+  padding-left: 1.5rem;
+  line-height: 1.65;
+}
+
+.doc li {
+  margin: 0.2rem 0;
+  padding-left: 0.2rem;
+}
+
+.doc li::marker {
+  color: var(--teal-deep);
+  font-family: "IBM Plex Mono", ui-monospace, monospace;
+  font-size: 0.85em;
+}
+
+/* An indented sub-item is always an example sentence for the rule above it,
+   so it is set apart rather than just pushed right. */
+.doc ul.beispiel,
+.doc ol.beispiel {
+  margin: 0.35rem 0 0.6rem;
+  padding-left: 1.6rem;
+  border-left: 2px solid var(--teal);
+  list-style: none;
+}
+
+.doc .beispiel li {
+  font-style: italic;
+  color: var(--muted);
+  padding-left: 0;
+  margin: 0.25rem 0;
+}
+
+.doc .beispiel strong,
+.doc .beispiel mark {
+  font-style: normal;
+}
+
+/* --------------------------------------------------------------- bits */
+
+.field {
+  width: 100%;
+  font: inherit;
+  font-size: 0.92rem;
+  padding: 0.5rem 0.7rem;
+  color: var(--ink);
+  background: var(--bg);
+  border: 1px solid var(--line);
+  border-radius: 3px;
+}
+
+.field:focus {
+  outline: none;
+  border-color: var(--coral);
+}
+
+.field::placeholder {
+  color: var(--muted);
+}
+
+.hint {
+  color: var(--muted);
+  font-size: 0.78rem;
+  margin: 0.4rem 0 0;
+}
+
+.btn {
+  font: inherit;
+  font-size: 0.88rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.4rem;
+  width: 100%;
+  padding: 0.45rem 0.7rem;
+  color: var(--ink);
+  background: none;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.btn:hover {
+  border-color: var(--coral);
+  color: var(--coral-deep);
+  background: var(--coral-wash);
+}
+
+.btn-primary {
+  width: auto;
+  background: var(--coral);
+  border-color: var(--coral);
+  color: #fffcf1;
+  font-weight: 500;
+}
+
+.btn-primary:hover {
+  background: var(--coral-deep);
+  border-color: var(--coral-deep);
+  color: #fffcf1;
+}
+
+.rule {
+  height: 1px;
+  background: var(--line);
+  border: none;
+  margin: 0.3rem 0;
+}
+
+.empty {
+  border: 1px dashed var(--line);
+  border-radius: 4px;
+  padding: 1.4rem;
+  color: var(--muted);
+  font-size: 0.92rem;
+}
+
+.empty strong {
+  color: var(--ink);
+}
+
+.spacer-grow {
+  flex: 1;
+}
+
+/* ------------------------------------------------------------- mobile */
+
+@media (max-width: 860px) {
+  .shell {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--line);
+    padding-bottom: 1.2rem;
+  }
+
+  .main {
+    padding: 1.6rem 1.15rem 4rem;
+  }
+
+  .masthead h1 {
+    font-size: 2.2rem;
+  }
+
+  .note-title {
+    font-size: 1.7rem;
+  }
+}
