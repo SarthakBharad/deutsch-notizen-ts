@@ -28,8 +28,8 @@ export default function Home() {
             <span>das</span>
           </h1>
           <p>
-            Everything I have written down for German, in one place I can search
-            — vocabulary, verb tables, and the prepositions I never remember.
+            Everything I have written down for German, all in one place
+            — vocabulary, verb tables, and the prepositions I must remember.
           </p>
         </section>
 

@@ -35,8 +35,7 @@ export function SiteFooter() {
         <div>
           <h2>About these notes</h2>
           <p>
-            My own notes from German class, kept in LibreOffice and read straight
-            off those files. Any mistakes in the German are mine.
+            My own notes from German classes, a compilation of content from the books of Hueber Verlag and Goethe.
           </p>
         </div>
 

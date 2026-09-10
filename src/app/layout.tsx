@@ -7,7 +7,7 @@ import "./globals.css";
 export const metadata: Metadata = {
   title: "Deutsch Notizen",
   description:
-    "My German notes — vocabulary, verb tables and grammar, read straight from the LibreOffice files I write them in.",
+    "My German notes — vocabulary, verb tables and grammar.",
   icons: { icon: "/icon.svg" },
 };
 
