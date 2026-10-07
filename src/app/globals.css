@@ -658,6 +658,315 @@ mark {
   margin-top: 0.8rem;
 }
 
+/* ----------------------------------------------------------------- tests */
+
+/*
+ * Right and wrong keep the same hues on every page, whatever the band: teal is
+ * right, coral is wrong. On an A-level page coral is also the accent, so a mark
+ * is never colour alone — every checked blank carries ✓ or ✕ beside it too.
+ */
+.test {
+  --right: var(--teal-ink);
+  --right-wash: var(--teal-wash);
+  --wrong: var(--coral-ink);
+  --wrong-wash: var(--coral-wash);
+
+  max-width: 82ch;
+  scroll-margin-top: 84px;
+}
+
+.test-intro {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.4rem 1rem;
+  margin-bottom: 1.1rem;
+}
+
+.test-intro h2 {
+  font-size: clamp(1.35rem, 3vw, 1.7rem);
+}
+
+.test-notice {
+  max-width: none;
+  margin: 0 0 1rem;
+}
+
+.exercise {
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 1.1rem 1.3rem 1.25rem;
+  margin-bottom: 1rem;
+}
+
+.exercise-head {
+  display: flex;
+  align-items: flex-start;
+  gap: 0.75rem;
+  margin-bottom: 0.75rem;
+}
+
+.exercise-num {
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: 1.75rem;
+  height: 1.75rem;
+  border-radius: 8px;
+  background: var(--accent);
+  color: var(--on-band);
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.exercise-head h3 {
+  flex: 1;
+  font-size: 1.06rem;
+  line-height: 1.35;
+  letter-spacing: -0.01em;
+  padding-top: 0.2rem;
+}
+
+.exercise-score {
+  flex: none;
+  font-size: 0.82rem;
+  font-weight: 600;
+  color: var(--ink-soft);
+  background: var(--hover);
+  padding: 0.18rem 0.62rem;
+  border-radius: 999px;
+  margin-top: 0.15rem;
+}
+
+.exercise-score[data-full] {
+  color: var(--right);
+  background: var(--right-wash);
+}
+
+/* The words to choose from. A used word is crossed off, as on paper. */
+.bank {
+  list-style: none;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin: 0 0 0.9rem;
+  padding: 0.6rem;
+  border: 1px dashed var(--line);
+  border-radius: 12px;
+}
+
+.bank li {
+  padding: 0.2rem 0.72rem;
+  border-radius: 999px;
+  background: var(--accent-wash);
+  color: var(--accent-ink);
+  font-size: 0.9rem;
+  font-weight: 500;
+  transition: opacity 0.15s ease;
+}
+
+.bank li[data-used] {
+  background: none;
+  box-shadow: inset 0 0 0 1px var(--line);
+  color: var(--ink-soft);
+  text-decoration: line-through;
+  opacity: 0.6;
+}
+
+/* Taller lines than a document: a sentence here has boxes sitting in it. */
+.test-lines,
+.test-line {
+  line-height: 2.15;
+}
+
+.test-lines {
+  margin: 0;
+  padding-left: 1.45rem;
+}
+
+.test-lines li {
+  margin: 0.2rem 0;
+  padding-left: 0.2rem;
+}
+
+.test-lines li::marker {
+  color: var(--accent-ink);
+  font-weight: 600;
+}
+
+ul.test-lines {
+  list-style: "–  ";
+}
+
+.test-lines li.deeper {
+  margin-left: 1.3rem;
+}
+
+.test-line {
+  margin: 0.35rem 0;
+}
+
+/* A worked example, already filled in: the underline it has in the .odt. */
+.example {
+  color: var(--accent-ink);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--accent);
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.blank {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.3rem;
+  max-width: 100%;
+  margin: 0 0.12rem;
+  vertical-align: baseline;
+  line-height: 1.5;
+}
+
+.blank input {
+  min-width: 4ch;
+  max-width: 100%;
+  font: inherit;
+  font-weight: 500;
+  color: var(--ink);
+  background: var(--paper);
+  border: 1px solid var(--line);
+  border-bottom: 2px solid var(--ink-soft);
+  border-radius: 7px 7px 3px 3px;
+  padding: 0.04rem 0.45rem;
+  transition: border-color 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
+}
+
+.blank input:focus {
+  outline: none;
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px var(--accent-wash);
+}
+
+.blank[data-verdict="right"] input,
+.blank[data-verdict="close"] input {
+  color: var(--right);
+  background: var(--right-wash);
+  border-color: var(--right);
+}
+
+.blank[data-verdict="close"] input {
+  border-style: dashed;
+}
+
+.blank[data-verdict="wrong"] input,
+.blank[data-verdict="empty"] input {
+  background: var(--wrong-wash);
+  border-color: var(--wrong);
+}
+
+.blank-mark {
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.blank[data-verdict="right"] .blank-mark,
+.blank[data-verdict="close"] .blank-mark {
+  color: var(--right);
+}
+
+.blank[data-verdict="wrong"] .blank-mark,
+.blank[data-verdict="empty"] .blank-mark {
+  color: var(--wrong);
+}
+
+.blank-key {
+  font-size: 0.86rem;
+  font-weight: 600;
+  color: var(--right);
+  background: var(--right-wash);
+  padding: 0 0.45rem;
+  border-radius: 6px;
+  white-space: nowrap;
+}
+
+/* Score and buttons stay in reach however long the chapter is. */
+.test-bar {
+  position: sticky;
+  bottom: 0.8rem;
+  z-index: 10;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.7rem 1rem;
+  margin-top: 1.4rem;
+  padding: 0.8rem 0.9rem 0.8rem 1.15rem;
+  background: color-mix(in srgb, var(--card) 90%, transparent);
+  backdrop-filter: blur(12px);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  box-shadow: 0 10px 30px -14px rgba(20, 33, 31, 0.35);
+}
+
+.test-score {
+  margin: 0;
+  font-size: 0.95rem;
+  color: var(--ink-soft);
+}
+
+.test-score strong {
+  font-family: "Bricolage Grotesque", sans-serif;
+  font-size: 1.2rem;
+  color: var(--ink);
+}
+
+.test-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.45rem;
+}
+
+.btn {
+  font: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  color: var(--ink);
+  background: var(--card);
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 0.5rem 1rem;
+  cursor: pointer;
+  transition: border-color 0.12s ease, filter 0.12s ease;
+}
+
+.btn:hover {
+  border-color: var(--ink-soft);
+}
+
+.btn-primary {
+  color: var(--on-band);
+  background: var(--accent);
+  border-color: var(--accent);
+}
+
+.btn-primary:hover {
+  border-color: var(--accent);
+  filter: brightness(0.95);
+}
+
+.btn:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.chip-score {
+  margin-left: 0.45rem;
+  font-size: 0.78rem;
+  opacity: 0.8;
+}
+
 /* ---------------------------------------------------------------- footer */
 
 .site-footer {
@@ -811,5 +1120,31 @@ mark {
   .search {
     flex-basis: 100%;
     order: 3;
+  }
+
+  .exercise {
+    padding: 0.95rem 1rem 1.05rem;
+  }
+
+  .test-bar {
+    bottom: 0.5rem;
+    gap: 0.5rem;
+    padding: 0.6rem 0.7rem 0.7rem;
+  }
+
+  .test-score {
+    font-size: 0.88rem;
+  }
+
+  .test-actions {
+    width: 100%;
+    gap: 0.35rem;
+  }
+
+  .test-actions .btn {
+    flex: 1 1 auto;
+    font-size: 0.85rem;
+    padding: 0.45rem 0.5rem;
+    white-space: nowrap;
   }
 }

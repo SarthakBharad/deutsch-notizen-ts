@@ -58,9 +58,63 @@ export type Block =
   | { kind: "list"; items: ListItem[] }
   | { kind: "table"; groups: SheetGroup[] };
 
+/* --------------------------------------------------------------- tests */
+
+/** A run of plain text inside a test line, with the formatting that matters. */
+export interface TestText {
+  kind: "text";
+  text: string;
+  bold: boolean;
+  italic: boolean;
+  /** underlined in the .odt — how a worked example ("geklettert (a)") is marked */
+  underline: boolean;
+}
+
+/** One gap to fill. Written `[Antwort]` in the .odt, or bare `_____`. */
+export interface TestBlank {
+  kind: "blank";
+  /** position within its chapter, from 0 — the key for what has been typed */
+  id: number;
+  /** accepted answers, from `[a/b]`; empty when the .odt only has underscores */
+  answers: string[];
+  /** rough box width in characters */
+  width: number;
+}
+
+export type TestSegment = TestText | TestBlank;
+
+export interface TestLine {
+  segments: TestSegment[];
+  /** 0 = a plain paragraph, 1 = a list item, 2+ = nested list item */
+  depth: number;
+  ordered: boolean;
+}
+
+/** Fill in the blanks — the only kind so far. New kinds join the union below. */
+export interface FillExercise {
+  type: "fill";
+  /** the bold line above it: "Ergänzen Sie das Possessivartikel." */
+  instruction: string;
+  /** "gezeichnet | gespielt | …" — the words to choose from, if any */
+  bank: string[];
+  lines: TestLine[];
+}
+
+export type Exercise = FillExercise;
+
+/** Everything under one level-1 heading ("Lektion - 1"). */
+export interface TestChapter {
+  /** url hash, slugified from the title: #lektion-1 */
+  slug: string;
+  title: string;
+  exercises: Exercise[];
+  /** number of blanks in the chapter; ids run 0..blanks-1 */
+  blanks: number;
+}
+
 /* --------------------------------------------------------------- notes */
 
-export type NoteKind = "sheet" | "document" | "book";
+export type NoteKind = "sheet" | "document" | "book" | "test";
 
 interface NoteBase {
   /** url segment, slugified from the title */
@@ -88,7 +142,13 @@ export interface BookNote extends NoteBase {
   size: number;
 }
 
-export type Note = SheetNote | DocumentNote | BookNote;
+/** `<Level> Tests.odt` — read as exercises rather than as a document. */
+export interface TestNote extends NoteBase {
+  kind: "test";
+  chapters: TestChapter[];
+}
+
+export type Note = SheetNote | DocumentNote | BookNote | TestNote;
 
 export interface LevelGroup {
   level: Level;

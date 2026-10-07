@@ -7,6 +7,8 @@
  * ships the result. `pnpm dev` and `pnpm build` both run this first.
  *
  * The filename is the metadata: `<Level>_<Title>`, underscores or spaces.
+ * A document titled "Tests" (`A2 Tests.odt`) is read as exercises instead of
+ * as a document — see scripts/tests.ts.
  */
 
 import { copyFileSync, mkdirSync, readdirSync, rmSync, statSync, writeFileSync } from "node:fs";
@@ -14,15 +16,25 @@ import path from "node:path";
 import { fileURLToPath } from "node:url";
 
 import { structure } from "../src/lib/layout.js";
-import { LEVELS, type Block, type Level, type Library, type Note, type Sheet } from "../src/lib/types.js";
+import {
+  LEVELS,
+  type Block,
+  type Level,
+  type Library,
+  type Note,
+  type Sheet,
+  type TestChapter,
+} from "../src/lib/types.js";
 import { readDocument, readSpreadsheet, type RawBlock } from "./odf.js";
+import { readTest, tally, type RawChapter } from "./tests.js";
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..");
 const NOTES_DIR = path.join(ROOT, "notizen");
 const OUT_FILE = path.join(ROOT, "src", "content", "notes.json");
 const BOOKS_DIR = path.join(ROOT, "public", "books");
 
-const KIND: Record<string, Note["kind"]> = {
+/** What the extension says. A test is an .odt too — its title decides, below. */
+const KIND: Record<string, Exclude<Note["kind"], "test">> = {
   ".ods": "sheet",
   ".odt": "document",
   ".pdf": "book",
@@ -59,6 +71,24 @@ function resolveBlocks(raw: RawBlock[]): Block[] {
   return raw.map((block) =>
     block.kind === "table" ? { kind: "table", groups: structure(block.grid.rows) } : block,
   );
+}
+
+/** `A2 Tests.odt`, `B1_Test.odt` — a document read as exercises. */
+const TEST_TITLE = /^tests?\b/i;
+
+/**
+ * Give each chapter a url hash. "Lektion - 1" becomes #lektion-1; a repeated
+ * heading gets -2, -3 so every tab still has an address of its own.
+ */
+function slugChapters(raw: RawChapter[]): TestChapter[] {
+  const seen = new Map<string, number>();
+  return raw.map((chapter, index) => {
+    const title = chapter.title || `Teil ${index + 1}`;
+    const base = slugify(title);
+    const count = (seen.get(base) ?? 0) + 1;
+    seen.set(base, count);
+    return { ...chapter, title, slug: count > 1 ? `${base}-${count}` : base };
+  });
 }
 
 const looseKey = (value: string) => value.toLowerCase().replace(/[^a-z0-9]+/g, "");
@@ -109,6 +139,17 @@ function build(): Library {
       }));
       notes.push({ ...base, kind, sheets, sortKey: `0${title.toLowerCase()}` });
       report(name, `${sheets.length} sheets`);
+    } else if (kind === "document" && TEST_TITLE.test(title)) {
+      const raw = readTest(file);
+      const chapters = slugChapters(raw);
+      notes.push({ ...base, kind: "test", chapters, sortKey: `0${title.toLowerCase()}` });
+
+      const { exercises, blanks, unanswered } = tally(raw);
+      report(
+        name,
+        `${count(chapters.length, "chapter")}, ${count(exercises, "exercise")}, ${count(blanks, "blank")}` +
+          (unanswered ? ` — ${unanswered} without an [answer]` : ""),
+      );
     } else if (kind === "document") {
       const blocks = dropRepeatedTitle(resolveBlocks(readDocument(file)), level, title);
       notes.push({ ...base, kind, blocks, sortKey: `0${title.toLowerCase()}` });
@@ -154,6 +195,10 @@ function build(): Library {
   }
 
   return { levels, builtAt: new Date().toISOString() };
+}
+
+function count(n: number, word: string) {
+  return `${n} ${word}${n === 1 ? "" : "s"}`;
 }
 
 function report(name: string, detail: string) {

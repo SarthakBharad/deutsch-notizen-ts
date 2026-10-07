@@ -3,6 +3,7 @@
 import { useMemo, useState } from "react";
 
 import { Document, Groups } from "@/components/Content";
+import { TestView } from "@/components/TestView";
 import { isBand, isEmptyCell } from "@/lib/layout";
 import { filterDocument, filterGroups, type Search } from "@/lib/search";
 import type { Note, SheetGroup } from "@/lib/types";
@@ -37,6 +38,7 @@ function countRows(groups: SheetGroup[]): number {
 export function NoteView({ note, search }: { note: Note; search: Search }) {
   if (note.kind === "book") return <BookView note={note} />;
   if (note.kind === "document") return <DocumentView note={note} search={search} />;
+  if (note.kind === "test") return <TestView note={note} />;
   return <SheetView note={note} search={search} />;
 }
 

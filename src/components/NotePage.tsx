@@ -48,7 +48,8 @@ export function NotePage({
                 </div>
               )}
 
-              {note.kind !== "book" && (
+              {/* Searching a test would only turn up its answers. */}
+              {note.kind !== "book" && note.kind !== "test" && (
                 <div className="search">
                   <input
                     type="search"
