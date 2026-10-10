@@ -776,10 +776,13 @@ mark {
   opacity: 0.6;
 }
 
-/* Taller lines than a document: a sentence here has boxes sitting in it. */
+/* Taller lines than a document: a sentence here has boxes sitting in it.
+   overflow-wrap lets an unbroken run — the letter grid in Lektion 2 — wrap
+   instead of pushing the page wider than a phone. */
 .test-lines,
 .test-line {
   line-height: 2.15;
+  overflow-wrap: anywhere;
 }
 
 .test-lines {

@@ -42,7 +42,8 @@ export interface RawChapter {
 const BLANK = /_{2,}[ \t ]*\[([^[\]\n]*)\]|\[([^[\]\n]*)\]|_{2,}/g;
 
 const MIN_WIDTH = 5;
-const MAX_WIDTH = 30;
+/** Whole-sentence answers ("… Deshalb hatte er einen Unfall.") need the room. */
+const MAX_WIDTH = 60;
 
 /* -------------------------------------------------------------- styles */
 

@@ -8,6 +8,8 @@
  * - A difference in capitals is "close", not right. In German the capital is
  *   part of the answer: "Ihre Blumen" (Herr Kuhnert's) and "ihre Puppen"
  *   (Melanie's) are different words.
+ * - A full stop, ? or ! at the very end is optional, for the answers that are
+ *   whole sentences ("… Deshalb hatte er einen Unfall.").
  */
 
 import type { Exercise, TestBlank } from "./types";
@@ -44,12 +46,15 @@ export function spellOut(text: string): string {
   return tidyAnswer(text).replace(/[äöüÄÖÜß]/g, (ch) => SPELLED[ch] ?? ch);
 }
 
+/** "…einen Unfall." and "…einen Unfall" are the same answer. */
+const loose = (text: string) => spellOut(text).replace(/\s*[.!?]+$/, "");
+
 export function grade(typed: string, answers: string[]): Verdict {
   if (!answers.length) return "open";
-  const given = spellOut(typed);
-  if (!given) return "empty";
+  if (!spellOut(typed)) return "empty";
+  const given = loose(typed);
 
-  const keys = answers.map(spellOut);
+  const keys = answers.map(loose);
   if (keys.includes(given)) return "right";
 
   const lower = given.toLowerCase();
